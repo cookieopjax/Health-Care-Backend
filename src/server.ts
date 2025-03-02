@@ -98,10 +98,6 @@ const start = async (): Promise<void> => {
       host: '0.0.0.0' // 接受來自所有 IP 的連接
     });
     
-    const address = fastify.server.address();
-    const port = typeof address === 'string' ? address : (address as AddressInfo).port;
-    
-    console.log(`服務器運行在 ${port} 端口`);
     console.log(`API文檔可在 http://localhost:${config.server.port}/documentation 查看`);
   } catch (err) {
     fastify.log.error(err);

@@ -12,6 +12,19 @@ interface LoggerConfig {
   level: string;
   transport?: {
     target: string;
+    options?: {
+      translateTime: string;
+      ignore?: string;
+      minimumLevel?: string;
+      singleLine?: boolean;
+      customPrettifiers?: Record<string, (input: any) => string>;
+      messageFormat?: string;
+      colorize?: boolean;
+    };
+  };
+  serializers?: {
+    req?: (req: any) => any;
+    res?: (res: any) => any;
   };
 }
 
@@ -56,8 +69,25 @@ const config: Config = {
   logger: {
     level: process.env.LOG_LEVEL || 'info',
     transport: process.env.NODE_ENV !== 'production' ? {
-      target: 'pino-pretty'
-    } : undefined
+      target: 'pino-pretty',
+      options: {
+        translateTime: 'HH:MM:ss',
+        ignore: 'pid,hostname,reqId,responseTime',
+        singleLine: true,
+        minimumLevel: 'info',
+        messageFormat: '{msg}',
+        colorize: true
+      }
+    } : undefined,
+    serializers: {
+      req: (req) => ({
+        method: req.method,
+        url: req.url
+      }),
+      res: (res) => ({
+        statusCode: res.statusCode
+      })
+    }
   },
 
   // OpenAI配置

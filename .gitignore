@@ -34,3 +34,5 @@ out/
 # 臨時文件
 tmp/
 temp/ 
+
+uploads/

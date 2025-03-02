@@ -41,73 +41,6 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     prefix: '/uploads/'
   });
 
-  // 測試API - 不需要上傳圖片
-  fastify.get<{
-    Reply: {
-      success: boolean;
-      data?: {
-        analysis: string;
-        image_url: string;
-      };
-      error?: string;
-    }
-  }>('/api/food/analyze/test', {
-    schema: {
-      description: '測試食物分析API（不需要上傳圖片）',
-      tags: ['食物分析'],
-      response: {
-        200: {
-          description: '分析結果',
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            data: {
-              type: 'object',
-              properties: {
-                analysis: { type: 'string' },
-                image_url: { type: 'string' }
-              }
-            }
-          }
-        },
-        500: {
-          description: '服務器錯誤',
-          type: 'object',
-          properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' }
-          }
-        }
-      }
-    },
-    handler: async (request: FastifyRequest, reply: FastifyReply) => {
-      try {
-        console.log('測試API - 不需要上傳圖片');
-        
-        // 使用測試路徑
-        const testImagePath = 'test_image_path';
-        
-        // 分析食物圖片（測試模式）
-        const result = await openaiService.analyzeFoodImage(testImagePath, true);
-
-        // 返回分析結果
-        return {
-          success: true,
-          data: {
-            analysis: result.analysis,
-            image_url: '/test_image.jpg'
-          }
-        };
-      } catch (error: any) {
-        request.log.error(error);
-        return reply.code(500).send({
-          success: false,
-          error: `測試分析失敗: ${error.message}`
-        });
-      }
-    }
-  });
-
   // 分析食物圖片API
   fastify.post<{
     Reply: {
@@ -178,11 +111,20 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         }
 
         // 獲取上傳的文件
-        const data = await request.file();
-        if (!data) {
+        let data;
+        try {
+          data = await request.file();
+          if (!data) {
+            return reply.code(400).send({
+              success: false,
+              error: '請上傳食物圖片'
+            });
+          }
+        } catch (fileError: any) {
+          // 處理 multipart 請求錯誤
           return reply.code(400).send({
             success: false,
-            error: '請上傳食物圖片'
+            error: '請上傳食物圖片，並確保請求格式正確'
           });
         }
 
@@ -205,8 +147,8 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         await pump(data.file, fs.createWriteStream(filePath));
         console.log(`文件已保存到本地臨時目錄: ${filePath}`);
 
-        // 分析食物圖片（實際圖片模式）
-        const result = await openaiService.analyzeFoodImage(filePath, false);
+        // 分析食物圖片
+        const result = await openaiService.analyzeFoodImage(filePath);
 
         // 獲取 S3 預簽名 URL
         let imageUrl = '';
