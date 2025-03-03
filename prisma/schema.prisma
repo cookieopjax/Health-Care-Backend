@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// 這是 Prisma 的 schema 檔案
+// 用於定義資料庫結構和關聯
+// 更多資訊請參考：https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"  // 使用 PostgreSQL 資料庫
+  url      = env("DATABASE_URL")  // 從環境變數讀取連接字串
+}
+
+// 使用者模型
+model User {
+  id            String          @id @default(uuid())  // 主鍵，使用 UUID
+  username      String          @unique               // 使用者名稱，必須唯一
+  email         String          @unique               // 電子郵件，必須唯一
+  password      String                                // 密碼（需要加密存儲）
+  createdAt     DateTime        @default(now())       // 建立時間，自動設定
+  updatedAt     DateTime        @updatedAt            // 更新時間，自動更新
+  calorieRecords CalorieRecord[]                      // 關聯到卡路里紀錄
+}
+
+// 食物模型
+model Food {
+  id            String          @id @default(uuid())  // 主鍵，使用 UUID
+  name          String                                // 食物名稱
+  calories      Int                                   // 卡路里
+  protein       Float?                                // 蛋白質（克）
+  carbs         Float?                                // 碳水化合物（克）
+  fat           Float?                                // 脂肪（克）
+  createdAt     DateTime        @default(now())       // 建立時間，自動設定
+  updatedAt     DateTime        @updatedAt            // 更新時間，自動更新
+  calorieRecords CalorieRecord[]                      // 關聯到卡路里紀錄
+}
+
+// 卡路里紀錄模型
+model CalorieRecord {
+  id            String          @id @default(uuid())  // 主鍵，使用 UUID
+  userId        String                                // 使用者 ID
+  foodId        String                                // 食物 ID
+  date          DateTime                               // 紀錄日期
+  mealType      MealType                              // 餐點類型（使用枚舉）
+  portion       Float           @default(1.0)         // 份量，預設為 1.0
+  imageUrl      String?                               // 食物圖片 URL（選填）
+  notes         String?                               // 備註（選填）
+  createdAt     DateTime        @default(now())       // 建立時間，自動設定
+  updatedAt     DateTime        @updatedAt            // 更新時間，自動更新
+
+  // 關聯設定
+  user          User            @relation(fields: [userId], references: [id])  // 關聯到使用者
+  food          Food            @relation(fields: [foodId], references: [id])  // 關聯到食物
+
+  // 索引設定
+  @@index([userId, date])      // 複合索引：使用者 ID + 日期
+  @@index([date])              // 單一索引：日期
+}
+
+// 餐點類型枚舉
+enum MealType {
+  breakfast    // 早餐
+  lunch        // 午餐
+  dinner       // 晚餐
+  snack        // 點心
+}

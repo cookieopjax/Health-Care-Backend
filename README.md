@@ -77,7 +77,7 @@ pnpm start
 啟動服務後，可以通過訪問以下URL查看API文檔：
 
 ```
-http://localhost:3000/documentation
+http://localhost:3000/docs
 ```
 
 這是一個交互式的Swagger文檔，您可以直接在瀏覽器中測試API。
