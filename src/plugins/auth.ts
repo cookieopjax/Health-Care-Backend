@@ -11,7 +11,11 @@ async function jwtPlugin(fastify: FastifyInstance, options: any) {
   // 加入 `authenticate` 裝飾函式 (middleware)
   fastify.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const user = await request.jwtVerify<any>()
+      const user = await request.jwtVerify<{
+        userId: string
+        email: string
+        [key: string]: any
+      }>()
       request.user = user
     } catch (err) {
       reply.status(401).send({
