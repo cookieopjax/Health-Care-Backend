@@ -11,6 +11,8 @@ import fastifyCors from '@fastify/cors';
 import routes from './routes/index.js';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { AddressInfo } from 'net';
+import jwtPlugin  from './plugins/auth.js';
+import jwt from '@fastify/jwt'
 
 // 獲取當前文件的目錄路徑
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +31,7 @@ fastify.register(fastifyCors, {
   exposedHeaders: ['Content-Disposition'],
   credentials: true
 });
+
 
 // 註冊靜態文件服務
 fastify.register(fastifyStatic, {
@@ -71,7 +74,9 @@ fastify.register(fastifySwagger, {
     },
     tags: [
       { name: '系統', description: '系統相關API' },
-      { name: '食物分析', description: '食物圖片分析相關API' }
+      { name: '食物分析', description: '食物圖片分析相關API' },
+      { name: '認證', description: '認證相關API' },
+      { name: '使用者', description: '使用者相關API' }
     ]
   }
 });
@@ -89,16 +94,25 @@ fastify.register(fastifySwaggerUI, {
 // 註冊路由
 fastify.register(routes);
 
+// 註冊認證外掛程式
+fastify.register(jwtPlugin);
+
+
+
 // 啟動服務器
 const start = async (): Promise<void> => {
   try {
-    // 使用配置中的端口和主機
+    // 等待所有插件註冊完成
+    await fastify.ready();
+
+    // 啟動伺服器
     await fastify.listen({ 
       port: config.server.port, 
-      host: '0.0.0.0' // 接受來自所有 IP 的連接
+      host: '0.0.0.0'
     });
     
     console.log(`API文檔可在 http://localhost:${config.server.port}/documentation 查看`);
+
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);

@@ -96,7 +96,8 @@ const config = {
     produces: ['application/json'],
     tags: [
       { name: '系統', description: '系統相關API' },
-      { name: '食物分析', description: '食物圖片分析相關API' }
+      { name: '食物分析', description: '食物圖片分析相關API' },
+      { name: '認證', description: '使用者認證相關API' }
     ],
     components: {
       schemas: {

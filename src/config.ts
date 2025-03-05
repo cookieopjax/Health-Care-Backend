@@ -40,6 +40,12 @@ interface UploadConfig {
   };
 }
 
+// 新增 JWT 配置介面
+interface JWTConfig {
+  secret: string;
+  expiresIn: string;
+}
+
 // 新增 AWS S3 配置介面
 interface S3Config {
   region: string;
@@ -55,6 +61,7 @@ interface Config {
   openai: OpenAIConfig;
   upload: UploadConfig;
   s3: S3Config; // 新增 S3 配置
+  jwt: JWTConfig; // 新增 JWT 配置
 }
 
 // 服務配置
@@ -102,6 +109,12 @@ const config: Config = {
     limits: {
       fileSize: 10 * 1024 * 1024 // 10MB
     }
+  },
+  
+  // JWT 配置
+  jwt: {
+    secret: process.env.JWT_SECRET || 'your-default-secret-key',
+    expiresIn: '7d'
   },
 
   // AWS S3 配置
