@@ -102,34 +102,5 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
     }
   })
 
-  // 更新 token
-  fastify.post('/refresh', {
-    schema: {
-      tags: ['認證']
-    },
-    onRequest: [async (request, reply) => {
-      await fastify.authenticate(request, reply)
-    }]
-  }, async (request, reply) => {
-    const user = request.user
-    const token = await generateToken(fastify, {
-      userId: user.userId,
-      email: user.email
-    })
-
-    return { token }
-  })
-
-  // 登出
-  fastify.post('/logout', {
-    schema: {
-      tags: ['認證']
-    },
-    onRequest: [async (request, reply) => {
-      await fastify.authenticate(request, reply)
-    }]
-  }, async (request, reply) => {
-    // 由於使用 JWT，登出只需要前端移除 token 即可
-    return { message: '登出成功' }
-  })
+  // TODO: refresh token
 } 
