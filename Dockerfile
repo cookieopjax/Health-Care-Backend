@@ -7,6 +7,8 @@ RUN corepack enable && corepack prepare pnpm@9.15.2 --activate
 # 設定工作目錄
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y openssl libssl1.1
+
 # 複製 package.json 和 pnpm-lock.yaml
 COPY package.json pnpm-lock.yaml ./
 
