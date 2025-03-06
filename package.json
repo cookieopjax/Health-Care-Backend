@@ -4,6 +4,10 @@
 	"description": "飲食管家後端服務",
 	"main": "dist/server.js",
 	"type": "module",
+	"engines": {
+		"node": ">=22.12.0",
+		"pnpm": ">=9.15.2"
+	},
 	"scripts": {
 		"start": "node dist/server.js",
 		"dev": "tsc-watch --onSuccess \"node dist/server.js\"",
