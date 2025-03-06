@@ -1,0 +1,26 @@
+# 版本控制
+.git
+.gitignore
+
+# 依賴
+node_modules
+dist
+
+# 環境變數
+.env
+.env.*
+!.env.example
+
+# 開發工具
+.vscode
+.idea
+*.log
+
+# 測試
+coverage
+.nyc_output
+
+# 其他
+README.md
+Dockerfile
+.dockerignore 
