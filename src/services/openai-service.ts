@@ -6,7 +6,7 @@ import * as s3Service from './s3-service.js'
 import path from 'path'
 
 // 定義 OpenAI API 的基本 URL
-const OPENAI_API_URL = 'https://api.openai.ㄙㄟ/v1/chat/completions'
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 const exampleObject = {
   "name": "食物名稱",
