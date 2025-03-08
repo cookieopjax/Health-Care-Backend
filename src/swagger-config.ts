@@ -122,7 +122,7 @@ const config = {
   
   // Swagger UI配置
   swaggerUI: {
-    routePrefix: '/documentation',
+    routePrefix: '/docs',
     uiConfig: {
       docExpansion: 'list' as 'list' | 'full' | 'none',
       deepLinking: true,

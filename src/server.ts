@@ -82,7 +82,7 @@ fastify.register(fastifySwagger, {
 });
 
 fastify.register(fastifySwaggerUI, {
-  routePrefix: '/documentation',
+  routePrefix: '/docs',
   uiConfig: {
     docExpansion: 'list',
     deepLinking: true,
@@ -111,7 +111,7 @@ const start = async (): Promise<void> => {
       host: '0.0.0.0'
     });
     
-    console.log(`API文檔可在 http://localhost:${config.server.port}/documentation 查看`);
+    console.log(`API文檔可在 http://localhost:${config.server.port}/docs 查看`);
 
   } catch (err) {
     fastify.log.error(err);
