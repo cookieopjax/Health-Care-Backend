@@ -1,68 +1,9 @@
 // 載入環境變量
 import dotenv from 'dotenv';
+import type { Config } from './types/config.js';
+import type { FastifyRequest, FastifyReply } from 'fastify';
+
 dotenv.config();
-
-// 定義配置介面
-interface ServerConfig {
-  port: number;
-  host: string;
-}
-
-interface LoggerConfig {
-  level: string;
-  transport?: {
-    target: string;
-    options?: {
-      translateTime: string;
-      ignore?: string;
-      minimumLevel?: string;
-      singleLine?: boolean;
-      customPrettifiers?: Record<string, (input: any) => string>;
-      messageFormat?: string;
-      colorize?: boolean;
-    };
-  };
-  serializers?: {
-    req?: (req: any) => any;
-    res?: (res: any) => any;
-  };
-}
-
-interface OpenAIConfig {
-  apiKey: string | undefined;
-  model: string;
-}
-
-interface UploadConfig {
-  dir: string;
-  limits: {
-    fileSize: number;
-  };
-}
-
-// 新增 JWT 配置介面
-interface JWTConfig {
-  secret: string;
-  expiresIn: string;
-}
-
-// 新增 AWS S3 配置介面
-interface S3Config {
-  region: string;
-  bucket: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  urlExpirationSeconds: number;
-}
-
-interface Config {
-  server: ServerConfig;
-  logger: LoggerConfig;
-  openai: OpenAIConfig;
-  upload: UploadConfig;
-  s3: S3Config; // 新增 S3 配置
-  jwt: JWTConfig; // 新增 JWT 配置
-}
 
 // 服務配置
 const config: Config = {
@@ -87,11 +28,11 @@ const config: Config = {
       }
     } : undefined,
     serializers: {
-      req: (req) => ({
+      req: (req: FastifyRequest) => ({
         method: req.method,
         url: req.url
       }),
-      res: (res) => ({
+      res: (res: FastifyReply) => ({
         statusCode: res.statusCode
       })
     }
