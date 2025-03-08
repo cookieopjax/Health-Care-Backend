@@ -6,11 +6,50 @@ import * as s3Service from './s3-service.js'
 import path from 'path'
 
 // 定義 OpenAI API 的基本 URL
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
+const OPENAI_API_URL = 'https://api.openai.ㄙㄟ/v1/chat/completions'
+
+const exampleObject = {
+  "name": "食物名稱",
+  "nutrition": [
+    {
+      "id": 1,
+      "name": "總熱量",
+      "unit": "kcal",
+      "value": 2000
+    },
+    {
+      "id": 2,
+      "name": "蛋白質",
+      "unit": "g",
+      "value": 75
+    },
+    {
+      "id": 3,
+      "name": "脂肪",
+      "unit": "g",
+      "value": 60
+    },
+    {
+      "id": 4,
+      "name": "碳水化合物",
+      "unit": "g",
+      "value": 250
+    },
+  ]
+}
+const analysisPrompt = `
+  你是一個專業的營養師，請分析以下食物圖片，並給出食物的營養成分和熱量。
+  若你判斷是範圍區間，請直接取平均值
+  請以 JSON 格式返回分析結果，任何其他文字都不要回傳
+  請以繁體中文回傳
+  格式如以下範例：
+  ${JSON.stringify(exampleObject)}
+  
+`
 
 // 定義分析結果介面
 interface AnalysisResult {
-  analysis: string;
+  analysis: object;
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;
@@ -77,9 +116,14 @@ async function processImage(imagePath: string): Promise<AnalysisResult> {
   // 調用 OpenAI API
   const data = await callOpenAIAPI(messages)
   
+  const analysisResult = data.choices[0].message.content
+
+  const cleanedString = analysisResult.replace(/^```json\n/, '').replace(/\n```$/, '')
+  const analysisResultObject = JSON.parse(cleanedString)
+
   // 返回分析結果，包含 S3 對象鍵
   return {
-    analysis: data.choices[0].message.content || '無法分析圖片',
+    analysis: analysisResultObject || '無法分析圖片',
     usage: data.usage,
     s3ObjectKey: objectKey
   }
@@ -117,7 +161,7 @@ function createImageAnalysisMessages(imageUrl: string): ChatCompletionMessagePar
       content: [
         {
           type: 'text' as const,
-          text: '請分析這張食物圖片的內容，告訴我這是什麼食物，並估算它的熱量和主要營養成分。'
+          text: analysisPrompt
         },
         {
           type: 'image_url' as const,
@@ -163,7 +207,8 @@ async function callOpenAIAPI(messages: any): Promise<any> {
     throw new Error(errorMessage)
   }
   
-  return await response.json()
+  const data = await response.json()
+  return data
 }
 
 export { analyzeFoodImage } 

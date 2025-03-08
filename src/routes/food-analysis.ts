@@ -46,7 +46,15 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     Reply: {
       success: boolean;
       data?: {
-        analysis: string;
+        analysis: {
+          name: string;
+          nutrition: Array<{
+            id: number;
+            name: string;
+            unit: string;
+            value: number;
+          }>;
+        };
         image_url: string;
       };
       error?: string;
@@ -76,7 +84,24 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
             data: {
               type: 'object',
               properties: {
-                analysis: { type: 'string' },
+                analysis: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string' },
+                    nutrition: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'number' },
+                          name: { type: 'string' },
+                          unit: { type: 'string' },
+                          value: { type: 'number' }
+                        }
+                      }
+                    }
+                  }
+                },
                 image_url: { type: 'string' }
               }
             }
@@ -166,14 +191,19 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
           // 繼續執行，不中斷流程
         }
 
-        // 返回分析結果
-        return {
+        // 確保回傳的分析結果是有效的物件
+        const analysisResult = result.analysis && typeof result.analysis === 'object' 
+          ? result.analysis 
+          : { error: '無效的分析結果' }
+        
+        // 使用 reply.send() 明確發送回應
+        return reply.send({
           success: true,
           data: {
-            analysis: result.analysis,
+            analysis: analysisResult,
             image_url: imageUrl || `/uploads/${fileName}` // 如果 S3 上傳失敗，使用本地路徑
           }
-        }
+        })
       } catch (error: any) {
         request.log.error(error)
         return reply.code(500).send({
