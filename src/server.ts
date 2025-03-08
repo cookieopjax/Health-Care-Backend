@@ -95,7 +95,9 @@ fastify.register(routes);
 // 註冊認證外掛程式
 fastify.register(jwtPlugin);
 
-
+const docsUrl = process.env.NODE_ENV === 'production' 
+  ? process.env.API_URL || `http://${config.server.host}:${config.server.port}/docs`
+  : `http://localhost:${config.server.port}/docs`;
 
 // 啟動服務器
 const start = async (): Promise<void> => {
@@ -109,7 +111,7 @@ const start = async (): Promise<void> => {
       host: '0.0.0.0'
     });
     
-    console.log(`API文檔可在 http://localhost:${config.server.port}/docs 查看`);
+    console.log(`API文檔可在 ${docsUrl} 查看`);
 
   } catch (err) {
     fastify.log.error(err);
