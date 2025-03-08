@@ -49,12 +49,10 @@ fastify.register(fastifySwagger, {
     },
     servers: [
       {
-        url: `http://localhost:${config.server.port}`,
-        description: '本地開發伺服器'
-      },
-      {
-        url: `http://127.0.0.1:${config.server.port}`,
-        description: '本地開發伺服器 (IP)'
+        url: process.env.NODE_ENV === 'production' 
+          ? process.env.API_URL || `http://${config.server.host}:${config.server.port}`
+          : `http://localhost:${config.server.port}`,
+        description: process.env.NODE_ENV === 'production' ? '正式環境' : '開發環境'
       }
     ],
     components: {
