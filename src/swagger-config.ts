@@ -72,6 +72,8 @@ interface Config {
   swaggerUI: SwaggerUIConfig;
 }
 
+const apiUrl = process.env.API_URL || 'http://localhost:3000'
+
 // 配置對象
 const config = {
   // Swagger文檔配置
@@ -88,8 +90,10 @@ const config = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: '本地開發伺服器'
+        url: apiUrl,
+        description: process.env.NODE_ENV === 'production' 
+          ? '正式環境' 
+          : '開發環境'
       }
     ],
     consumes: ['application/json', 'multipart/form-data'],
