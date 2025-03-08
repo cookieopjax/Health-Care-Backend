@@ -1,9 +1,9 @@
 // 載入環境變量
-import dotenv from 'dotenv';
-import type { Config } from './types/config.js';
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import dotenv from 'dotenv'
+import type { Config } from './types/config.js'
+import type { FastifyRequest, FastifyReply } from 'fastify'
 
-dotenv.config();
+dotenv.config()
 
 // 服務配置
 const config: Config = {
@@ -66,6 +66,6 @@ const config: Config = {
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     urlExpirationSeconds: parseInt(process.env.AWS_URL_EXPIRATION_SECONDS || '3600', 10)
   }
-};
+}
 
-export default config; 
+export default config 

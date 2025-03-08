@@ -1,12 +1,12 @@
 // OpenAI服務
-import fs from 'fs';
-import config from '../config.js';
-import { writeFile } from 'fs/promises';
-import * as s3Service from './s3-service.js';
-import path from 'path';
+import fs from 'fs'
+import config from '../config.js'
+import { writeFile } from 'fs/promises'
+import * as s3Service from './s3-service.js'
+import path from 'path'
 
 // 定義 OpenAI API 的基本 URL
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 // 定義分析結果介面
 interface AnalysisResult {
@@ -39,9 +39,9 @@ interface ChatCompletionMessageParam {
  */
 async function analyzeFoodImage(imagePath: string): Promise<AnalysisResult> {
   try {
-    return await processImage(imagePath);
+    return await processImage(imagePath)
   } catch (error: any) {
-    throw new Error(`分析食物圖片失敗: ${error.message}`);
+    throw new Error(`分析食物圖片失敗: ${error.message}`)
   }
 }
 
@@ -53,36 +53,36 @@ async function analyzeFoodImage(imagePath: string): Promise<AnalysisResult> {
 async function processImage(imagePath: string): Promise<AnalysisResult> {
   // 檢查文件是否存在
   if (!fs.existsSync(imagePath)) {
-    throw new Error(`圖片文件不存在: ${imagePath}`);
+    throw new Error(`圖片文件不存在: ${imagePath}`)
   }
   
   // 獲取文件大小並檢查
-  const stats = fs.statSync(imagePath);
+  const stats = fs.statSync(imagePath)
   if (stats.size > 20 * 1024 * 1024) { // 20MB
-    throw new Error(`圖片文件過大，請上傳小於 20MB 的圖片`);
+    throw new Error(`圖片文件過大，請上傳小於 20MB 的圖片`)
   }
 
   // 獲取文件類型
-  const contentType = getImageContentType(imagePath);
+  const contentType = getImageContentType(imagePath)
   
   // 上傳圖片到 S3
-  const objectKey = await s3Service.uploadFileToS3(imagePath, contentType);
+  const objectKey = await s3Service.uploadFileToS3(imagePath, contentType)
   
   // 獲取預簽名 URL
-  const imageUrl = await s3Service.getSignedS3Url(objectKey);
+  const imageUrl = await s3Service.getSignedS3Url(objectKey)
 
   // 構建請求內容
-  const messages = createImageAnalysisMessages(imageUrl);
+  const messages = createImageAnalysisMessages(imageUrl)
   
   // 調用 OpenAI API
-  const data = await callOpenAIAPI(messages);
+  const data = await callOpenAIAPI(messages)
   
   // 返回分析結果，包含 S3 對象鍵
   return {
     analysis: data.choices[0].message.content || '無法分析圖片',
     usage: data.usage,
     s3ObjectKey: objectKey
-  };
+  }
 }
 
 /**
@@ -91,17 +91,17 @@ async function processImage(imagePath: string): Promise<AnalysisResult> {
  * @returns {string} - 內容類型
  */
 function getImageContentType(imagePath: string): string {
-  const fileExtension = path.extname(imagePath).toLowerCase();
+  const fileExtension = path.extname(imagePath).toLowerCase()
   
   switch (fileExtension) {
     case '.png':
-      return 'image/png';
+      return 'image/png'
     case '.gif':
-      return 'image/gif';
+      return 'image/gif'
     case '.webp':
-      return 'image/webp';
+      return 'image/webp'
     default:
-      return 'image/jpeg'; // 預設為 JPEG
+      return 'image/jpeg' // 預設為 JPEG
   }
 }
 
@@ -127,7 +127,7 @@ function createImageAnalysisMessages(imageUrl: string): ChatCompletionMessagePar
         }
       ]
     }
-  ];
+  ]
 }
 
 /**
@@ -147,23 +147,23 @@ async function callOpenAIAPI(messages: any): Promise<any> {
       messages,
       max_tokens: 1000
     })
-  });
+  })
   
   if (!response.ok) {
-    const errorText = await response.text();
-    let errorMessage = `OpenAI API 錯誤: ${response.status}`;
+    const errorText = await response.text()
+    let errorMessage = `OpenAI API 錯誤: ${response.status}`
     
     try {
-      const errorData = JSON.parse(errorText);
-      errorMessage += ` - ${JSON.stringify(errorData)}`;
+      const errorData = JSON.parse(errorText)
+      errorMessage += ` - ${JSON.stringify(errorData)}`
     } catch (e) {
-      errorMessage += ` - ${errorText}`;
+      errorMessage += ` - ${errorText}`
     }
     
-    throw new Error(errorMessage);
+    throw new Error(errorMessage)
   }
   
-  return await response.json();
+  return await response.json()
 }
 
-export { analyzeFoodImage }; 
+export { analyzeFoodImage } 

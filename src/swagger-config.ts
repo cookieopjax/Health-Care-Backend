@@ -1,7 +1,7 @@
 // Swagger配置
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { SwaggerOptions } from '@fastify/swagger';
-import { FastifySwaggerUiOptions } from '@fastify/swagger-ui';
+import { FastifyRequest, FastifyReply } from 'fastify'
+import { SwaggerOptions } from '@fastify/swagger'
+import { FastifySwaggerUiOptions } from '@fastify/swagger-ui'
 
 // 定義 Swagger 配置介面
 interface SwaggerInfo {
@@ -138,6 +138,6 @@ const config = {
     staticCSP: true,
     transformStaticCSP: (header: string) => header
   } as FastifySwaggerUiOptions
-};
+}
 
-export default config; 
+export default config 

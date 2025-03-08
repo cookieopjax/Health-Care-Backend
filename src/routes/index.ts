@@ -1,8 +1,8 @@
 // 路由索引文件
-import { FastifyInstance, FastifyPluginAsync } from 'fastify';
-import foodAnalysisRoutes from './food-analysis.js';
-import { registerRoutes as registerAuthRoutes } from './auth.js';
-import { userRoutes } from './users.js';
+import { FastifyInstance, FastifyPluginAsync } from 'fastify'
+import foodAnalysisRoutes from './food-analysis.js'
+import { registerRoutes as registerAuthRoutes } from './auth.js'
+import { userRoutes } from './users.js'
 
 /**
  * 註冊所有路由
@@ -33,21 +33,21 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         message: '服務正常運行中',
         timestamp: new Date().toISOString(),
         version: '1.0.0'
-      };
+      }
     }
-  });
+  })
 
   // 註冊食物分析路由
-  await fastify.register(foodAnalysisRoutes);
+  await fastify.register(foodAnalysisRoutes)
 
   // 註冊認證路由
-  await fastify.register(registerAuthRoutes, { prefix: '/auth' });
+  await fastify.register(registerAuthRoutes, { prefix: '/auth' })
 
   // 註冊使用者路由
-  await fastify.register(userRoutes, { prefix: '/users' });
+  await fastify.register(userRoutes, { prefix: '/users' })
 
   // 在這裡可以添加更多路由或引入其他路由模塊
   // 例如: await fastify.register(userRoutes, { prefix: '/api/users' });
-};
+}
 
-export default routes; 
+export default routes 
