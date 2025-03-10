@@ -1,6 +1,5 @@
 // 引入配置
 import config from './config.js'
-import swaggerConfig from './swagger-config.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import Fastify from 'fastify'
@@ -10,9 +9,7 @@ import fastifyStatic from '@fastify/static'
 import fastifyCors from '@fastify/cors'
 import routes from './routes/index.js'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
-import { AddressInfo } from 'net'
 import jwtPlugin  from './plugins/auth.js'
-import jwt from '@fastify/jwt'
 
 // 獲取當前文件的目錄路徑
 const __filename = fileURLToPath(import.meta.url)

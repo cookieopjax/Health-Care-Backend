@@ -10,7 +10,6 @@ import * as openaiService from '../services/openai-service.js'
 import * as s3Service from '../services/s3-service.js'
 import config from '../config.js'
 import { FastifyInstance, FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify'
-import { MultipartFile } from '@fastify/multipart'
 
 // 獲取當前文件的目錄路徑
 const __filename = fileURLToPath(import.meta.url)
@@ -157,7 +156,7 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
               error: '請上傳食物圖片'
             })
           }
-        } catch (fileError: any) {
+        } catch {
           // 處理 multipart 請求錯誤
           return reply.code(400).send({
             success: false,
@@ -216,11 +215,11 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
             image_url: imageUrl || `/uploads/${fileName}` // 如果 S3 上傳失敗，使用本地路徑
           }
         })
-      } catch (error: any) {
+      } catch (error: unknown) {
         request.log.error(error)
         return reply.code(500).send({
           success: false,
-          error: `分析食物圖片失敗: ${error.message}`
+          error: `分析食物圖片失敗: ${error instanceof Error ? error.message : 'Unknown error'}`
         })
       }
     }
