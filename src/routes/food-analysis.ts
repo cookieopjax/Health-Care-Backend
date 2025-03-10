@@ -26,7 +26,7 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   })
 
   // 添加 preValidation hook，用於處理 multipart 請求
-  fastify.addHook('preValidation', async (request, reply) => {
+  fastify.addHook('preValidation', async (request) => {
     if (request.routeOptions.url === '/api/food/analyze' && request.method === 'POST') {
       // 模擬 food_image 屬性的存在，以通過驗證
       request.body = {
@@ -60,9 +60,13 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
       error?: string;
     }
   }>('/api/food/analyze', {
+    onRequest: [async (request, reply) => {
+      await fastify.authenticate(request, reply)
+    }],
     schema: {
       description: '分析食物圖片',
       tags: ['食物分析'],
+      security: [{ bearerAuth: [] }],
       consumes: ['multipart/form-data'],
       body: {
         type: 'object',
@@ -109,6 +113,14 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         },
         400: {
           description: '請求錯誤',
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            error: { type: 'string' }
+          }
+        },
+        401: {
+          description: '未授權的存取',
           type: 'object',
           properties: {
             success: { type: 'boolean' },

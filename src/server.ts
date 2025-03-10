@@ -39,6 +39,9 @@ fastify.register(fastifyStatic, {
   prefix: '/'
 })
 
+// 註冊認證外掛程式
+fastify.register(jwtPlugin)
+
 // 註冊Swagger插件
 fastify.register(fastifySwagger, {
   openapi: {
@@ -56,6 +59,13 @@ fastify.register(fastifySwagger, {
       }
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      },
       schemas: {
         fileUploadSchema: {
           type: 'object',
@@ -91,9 +101,6 @@ fastify.register(fastifySwaggerUI, {
 
 // 註冊路由
 fastify.register(routes)
-
-// 註冊認證外掛程式
-fastify.register(jwtPlugin)
 
 const docsUrl = process.env.NODE_ENV === 'production' 
   ? process.env.API_URL || `http://${config.server.host}:${config.server.port}/docs`
