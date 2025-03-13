@@ -80,8 +80,7 @@ describe('食物分析路由測試', () => {
       .expect(400) // 現在應該返回 400 錯誤
 
     expect(response.body).toEqual({
-      success: false,
-      error: '請上傳食物圖片，並確保請求格式正確'
+      msg: '請上傳食物圖片，並確保請求格式正確'
     })
   })
 
@@ -95,8 +94,7 @@ describe('食物分析路由測試', () => {
       .expect(400)
 
     expect(response.body).toEqual({
-      success: false,
-      error: '請上傳有效的圖片文件'
+      msg: '請上傳有效的圖片文件'
     })
   })
 
@@ -107,7 +105,6 @@ describe('食物分析路由測試', () => {
       .expect(200)
 
     expect(response.body).toEqual({
-      success: true,
       data: {
         analysis: '這是一份健康的沙拉，含有雞肉、生菜和番茄。估計熱量約為 250 大卡。',
         image_url: 'https://example.com/test-food-image.jpg'
@@ -131,8 +128,7 @@ describe('食物分析路由測試', () => {
       .expect(500)
 
     expect(response.body).toEqual({
-      success: false,
-      error: expect.stringContaining('分析食物圖片失敗')
+      msg: expect.stringContaining('分析食物圖片失敗')
     })
   })
 }) 

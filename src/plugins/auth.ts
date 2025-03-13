@@ -19,7 +19,7 @@ async function jwtPlugin(fastify: FastifyInstance, options: any) {
       request.user = user
     } catch (err) {
       reply.status(401).send({
-        error: '未授權的存取'
+        msg: '未授權的存取'
       })
     }
   })

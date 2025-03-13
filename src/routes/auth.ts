@@ -28,7 +28,7 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
 
     if (existingUser) {
       return reply.status(400).send({
-        error: '使用者已存在'
+        msg: '使用者已存在'
       })
     }
 
@@ -62,7 +62,34 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
   fastify.post('/login', {
     schema: {
       body: LoginSchema,
-      tags: ['認證']
+      tags: ['認證'],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              properties: {
+                token: { type: 'string' },
+                user: {
+                  type: 'object',
+                  properties: {
+                    id: { type: 'string' },
+                    username: { type: 'string' },
+                    email: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        },
+        401: {
+          type: 'object',
+          properties: {
+            msg: { type: 'string' }
+          }
+        }
+      }
     }
   }, async (request, reply) => {
     const { email, password } = request.body as typeof LoginSchema
@@ -74,7 +101,7 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
 
     if (!user) {
       return reply.status(401).send({
-        error: '帳號或密碼錯誤'
+        msg: '帳號或密碼錯誤'
       })
     }
 
@@ -82,7 +109,7 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
     const isValid = await verifyPassword(password, user.password)
     if (!isValid) {
       return reply.status(401).send({
-        error: '帳號或密碼錯誤'
+        msg: '帳號或密碼錯誤'
       })
     }
 
@@ -93,11 +120,13 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
     })
 
     return {
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email
+      data: {
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email
+        }
       }
     }
   })

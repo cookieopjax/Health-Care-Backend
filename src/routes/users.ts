@@ -18,7 +18,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 
     if (!userData) {
       return reply.status(404).send({
-        error: '使用者不存在'
+        msg: '使用者不存在'
       })
     }
 
@@ -50,7 +50,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 
       if (existingUser) {
         return reply.status(400).send({
-          error: '此電子郵件已被使用'
+          msg: '此電子郵件已被使用'
         })
       }
     }
@@ -68,7 +68,7 @@ export async function userRoutes(fastify: FastifyInstance) {
 
       if (existingUser) {
         return reply.status(400).send({
-          error: '此使用者名稱已被使用'
+          msg: '此使用者名稱已被使用'
         })
       }
     }

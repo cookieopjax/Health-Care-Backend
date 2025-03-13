@@ -43,7 +43,6 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   // 分析食物圖片API
   fastify.post<{
     Reply: {
-      success: boolean;
       data?: {
         analysis: {
           name: string;
@@ -56,7 +55,7 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         };
         image_url: string;
       };
-      error?: string;
+      msg?: string;
     }
   }>('/api/food/analyze', {
     onRequest: [async (request, reply) => {
@@ -83,7 +82,6 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
           description: '分析結果',
           type: 'object',
           properties: {
-            success: { type: 'boolean' },
             data: {
               type: 'object',
               properties: {
@@ -114,24 +112,21 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
           description: '請求錯誤',
           type: 'object',
           properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' }
+            msg: { type: 'string' }
           }
         },
         401: {
           description: '未授權的存取',
           type: 'object',
           properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' }
+            msg: { type: 'string' }
           }
         },
         500: {
           description: '服務器錯誤',
           type: 'object',
           properties: {
-            success: { type: 'boolean' },
-            error: { type: 'string' }
+            msg: { type: 'string' }
           }
         }
       }
@@ -152,15 +147,13 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
           data = await request.file()
           if (!data) {
             return reply.code(400).send({
-              success: false,
-              error: '請上傳食物圖片'
+              msg: '請上傳食物圖片'
             })
           }
         } catch {
           // 處理 multipart 請求錯誤
           return reply.code(400).send({
-            success: false,
-            error: '請上傳食物圖片，並確保請求格式正確'
+            msg: '請上傳食物圖片，並確保請求格式正確'
           })
         }
 
@@ -168,8 +161,7 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         const fileType = data.mimetype
         if (!fileType.startsWith('image/')) {
           return reply.code(400).send({
-            success: false,
-            error: '請上傳有效的圖片文件'
+            msg: '請上傳有效的圖片文件'
           })
         }
 
@@ -209,7 +201,6 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         
         // 使用 reply.send() 明確發送回應
         return reply.send({
-          success: true,
           data: {
             analysis: analysisResult,
             image_url: imageUrl || `/uploads/${fileName}` // 如果 S3 上傳失敗，使用本地路徑
@@ -218,8 +209,7 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
       } catch (error: unknown) {
         request.log.error(error)
         return reply.code(500).send({
-          success: false,
-          error: `分析食物圖片失敗: ${error instanceof Error ? error.message : 'Unknown error'}`
+          msg: `分析食物圖片失敗: ${error instanceof Error ? error.message : 'Unknown error'}`
         })
       }
     }
