@@ -67,18 +67,13 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
         200: {
           type: 'object',
           properties: {
-            data: {
+            token: { type: 'string' },
+            user: {
               type: 'object',
               properties: {
-                token: { type: 'string' },
-                user: {
-                  type: 'object',
-                  properties: {
-                    id: { type: 'string' },
-                    username: { type: 'string' },
-                    email: { type: 'string' }
-                  }
-                }
+                id: { type: 'string' },
+                username: { type: 'string' },
+                email: { type: 'string' }
               }
             }
           }
@@ -120,13 +115,11 @@ export const registerRoutes: FastifyPluginAsync = async (fastify: FastifyInstanc
     })
 
     return {
-      data: {
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email
-        }
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
       }
     }
   })

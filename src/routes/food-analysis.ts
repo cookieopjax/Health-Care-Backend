@@ -43,18 +43,16 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   // 分析食物圖片API
   fastify.post<{
     Reply: {
-      data?: {
-        analysis: {
+      analysis?: {
+        name: string;
+        nutrition: Array<{
+          id: number;
           name: string;
-          nutrition: Array<{
-            id: number;
-            name: string;
-            unit: string;
-            value: number;
-          }>;
-        };
-        image_url: string;
+          unit: string;
+          value: number;
+        }>;
       };
+      image_url?: string;
       msg?: string;
     }
   }>('/api/food/analyze', {
@@ -82,30 +80,25 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
           description: '分析結果',
           type: 'object',
           properties: {
-            data: {
+            analysis: {
               type: 'object',
               properties: {
-                analysis: {
-                  type: 'object',
-                  properties: {
-                    name: { type: 'string' },
-                    nutrition: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          id: { type: 'number' },
-                          name: { type: 'string' },
-                          unit: { type: 'string' },
-                          value: { type: 'number' }
-                        }
-                      }
+                name: { type: 'string' },
+                nutrition: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'number' },
+                      name: { type: 'string' },
+                      unit: { type: 'string' },
+                      value: { type: 'number' }
                     }
                   }
-                },
-                image_url: { type: 'string' }
+                }
               }
-            }
+            },
+            image_url: { type: 'string' }
           }
         },
         400: {
@@ -201,10 +194,8 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
         
         // 使用 reply.send() 明確發送回應
         return reply.send({
-          data: {
-            analysis: analysisResult,
-            image_url: imageUrl || `/uploads/${fileName}` // 如果 S3 上傳失敗，使用本地路徑
-          }
+          analysis: analysisResult,
+          image_url: imageUrl || `/uploads/${fileName}` // 如果 S3 上傳失敗，使用本地路徑
         })
       } catch (error: unknown) {
         request.log.error(error)

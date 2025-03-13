@@ -1,6 +1,6 @@
-# 健康照護後端服務
+# 飲食管家後端服務
 
-這是一個使用Fastify框架構建的基礎後端服務。
+這是一個基於 Fastify 框架開發的後端服務，提供飲食管理相關的 API 服務。
 
 ## 功能
 
@@ -8,17 +8,131 @@
 - API文檔：使用Swagger提供的交互式API文檔
 - 食物分析：使用ChatGPT Vision API分析食物照片的熱量和營養成分
 
+## 技術棧
+
+- **執行環境**: Node.js >= 22.12.0
+- **套件管理**: pnpm >= 9.15.2
+- **主要框架**: Fastify
+- **資料庫**: Prisma ORM
+- **API 文件**: Swagger UI
+- **檔案儲存**: AWS S3
+- **開發工具**:
+  - TypeScript
+  - ESLint
+  - Vitest (單元測試)
+
+## 專案結構
+
+```
+src/
+├── config.ts          # 環境配置
+├── server.ts          # 應用程式入口
+├── swagger-config.ts  # Swagger 配置
+├── lib/              # 共用函式庫
+├── plugins/          # Fastify 插件
+├── routes/           # API 路由
+├── services/         # 業務邏輯
+├── types/            # TypeScript 型別定義
+└── utils/            # 工具函數
+```
+
 ## 安裝
 
-確保您已安裝Node.js和npm/pnpm，然後執行：
+1. 安裝依賴套件：
 
 ```bash
-# 使用npm
-npm install
-
-# 或使用pnpm
 pnpm install
 ```
+
+2. 設定環境變數：
+
+```bash
+cp .env.example .env
+```
+
+3. 設定資料庫：
+
+```bash
+pnpm prisma generate
+pnpm prisma migrate deploy
+```
+
+## 開發
+
+啟動開發伺服器：
+
+```bash
+pnpm dev
+```
+
+## 建置
+
+建置專案：
+
+```bash
+pnpm build
+```
+
+## 測試
+
+執行測試：
+
+```bash
+# 執行所有測試
+pnpm test
+
+# 監視模式
+pnpm test:watch
+
+# 產生測試覆蓋率報告
+pnpm test:coverage
+```
+
+## 程式碼品質
+
+執行 ESLint：
+
+```bash
+pnpm lint
+```
+
+## Docker 部署
+
+使用 Docker 建置映像：
+
+```bash
+docker build -t health-care-backend .
+```
+
+執行容器：
+
+```bash
+docker run -p 3000:3000 health-care-backend
+```
+
+## API 文件
+
+啟動服務後，可透過以下路徑存取 Swagger UI：
+
+```
+http://localhost:3000/api-docs
+```
+
+## 環境變數
+
+主要環境變數說明：
+
+- `PORT`: 服務埠號
+- `DATABASE_URL`: 資料庫連線字串
+- `JWT_SECRET`: JWT 密鑰
+- `AWS_ACCESS_KEY_ID`: AWS 存取金鑰 ID
+- `AWS_SECRET_ACCESS_KEY`: AWS 密鑰
+- `AWS_REGION`: AWS 區域
+- `AWS_BUCKET_NAME`: S3 儲存桶名稱
+
+## 授權
+
+MIT
 
 ## 配置
 
@@ -44,20 +158,12 @@ UPLOAD_DIR=uploads
 ### 開發模式
 
 ```bash
-# 使用npm
-npm run dev
-
-# 或使用pnpm
 pnpm dev
 ```
 
 ### 生產模式
 
 ```bash
-# 使用npm
-npm start
-
-# 或使用pnpm
 pnpm start
 ```
 
@@ -108,11 +214,8 @@ http://localhost:3000/docs
 - **響應示例**:
   ```json
   {
-    "success": true,
-    "data": {
-      "analysis": "這是一份漢堡套餐，包含漢堡、薯條和可樂。估計熱量約為800-1000卡路里。漢堡中含有約30克蛋白質、45克脂肪和60克碳水化合物。這是一份高熱量、高脂肪的食物，建議偶爾食用，不宜經常食用。",
-      "image_url": "/uploads/food_1677123456789.jpg"
-    }
+    "analysis": "這是一份漢堡套餐，包含漢堡、薯條和可樂。估計熱量約為800-1000卡路里。漢堡中含有約30克蛋白質、45克脂肪和60克碳水化合物。這是一份高熱量、高脂肪的食物，建議偶爾食用，不宜經常食用。",
+    "image_url": "/uploads/food_1677123456789.jpg"
   }
   ```
 
