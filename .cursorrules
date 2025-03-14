@@ -14,3 +14,10 @@
 
 更動程式碼時，不要刪除原有的註解
 不用針對引入配置註解
+
+
+## When generating commit messages:
+1 .Use conventional commit message format.
+2. Use traditional Chinese zh-TW.
+3. Write a concise commit message from 'git diff --staged' output in the format [TYPE](file/topic): [description] 
+4. Present tense, active voice, max 240 characters per line, no code blocks.
