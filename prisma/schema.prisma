@@ -25,42 +25,7 @@ model User {
   password      String                                // 密碼（需要加密存儲）
   createdAt     DateTime        @default(now())       // 建立時間，自動設定
   updatedAt     DateTime        @updatedAt            // 更新時間，自動更新
-  calorieRecords CalorieRecord[]                      // 關聯到卡路里紀錄
-}
-
-// 食物模型
-model Food {
-  id            String          @id @default(uuid())  // 主鍵，使用 UUID
-  name          String                                // 食物名稱
-  calories      Int                                   // 卡路里
-  protein       Float?                                // 蛋白質（克）
-  carbs         Float?                                // 碳水化合物（克）
-  fat           Float?                                // 脂肪（克）
-  createdAt     DateTime        @default(now())       // 建立時間，自動設定
-  updatedAt     DateTime        @updatedAt            // 更新時間，自動更新
-  calorieRecords CalorieRecord[]                      // 關聯到卡路里紀錄
-}
-
-// 卡路里紀錄模型
-model CalorieRecord {
-  id            String          @id @default(uuid())  // 主鍵，使用 UUID
-  userId        String                                // 使用者 ID
-  foodId        String                                // 食物 ID
-  date          DateTime                               // 紀錄日期
-  mealType      MealType                              // 餐點類型（使用枚舉）
-  portion       Float           @default(1.0)         // 份量，預設為 1.0
-  imageUrl      String?                               // 食物圖片 URL（選填）
-  notes         String?                               // 備註（選填）
-  createdAt     DateTime        @default(now())       // 建立時間，自動設定
-  updatedAt     DateTime        @updatedAt            // 更新時間，自動更新
-
-  // 關聯設定
-  user          User            @relation(fields: [userId], references: [id])  // 關聯到使用者
-  food          Food            @relation(fields: [foodId], references: [id])  // 關聯到食物
-
-  // 索引設定
-  @@index([userId, date])      // 複合索引：使用者 ID + 日期
-  @@index([date])              // 單一索引：日期
+  mealRecords   MealRecord[]                         // 關聯到餐食紀錄
 }
 
 // 餐點類型枚舉
@@ -69,4 +34,42 @@ enum MealType {
   lunch        // 午餐
   dinner       // 晚餐
   snack        // 點心
+}
+
+// 整合後的餐食紀錄模型
+model MealRecord {
+  id          String    @id @default(uuid())         // 主鍵，使用 UUID
+  userId      String                                 // 使用者 ID
+  
+  // 食物基本資訊
+  foodName    String    @db.VarChar(100)            // 食物名稱
+  description String?                                // 描述（選填）
+  imageUrl    String?                                // 圖片 URL（選填）
+  
+  // 用餐資訊
+  mealType    MealType                              // 餐點類型（早餐、午餐、晚餐、點心）
+  notes       String?                                // 備註（選填）
+  
+  // 營養資訊
+  calories    Int                                    // 卡路里
+  protein     Float?                                 // 蛋白質（克）
+  carbs       Float?                                 // 碳水化合物（克）
+  fat         Float?                                 // 脂肪（克）
+  fiber       Float?                                 // 膳食纖維（克）
+  sugar       Float?                                 // 糖（克）
+  sodium      Float?                                 // 鈉（毫克）
+  
+  // 時間資訊
+  recordDate  DateTime  @db.Date                     // 記錄日期
+  recordTime  DateTime  @db.Time()                   // 記錄時間
+  createdAt   DateTime  @default(now())              // 建立時間
+  updatedAt   DateTime  @updatedAt                   // 更新時間
+
+  // 關聯設定
+  user        User      @relation(fields: [userId], references: [id])
+
+  // 索引設定
+  @@index([userId, recordDate])                      // 複合索引：使用者 ID + 記錄日期
+  @@index([recordDate])                              // 單一索引：日期
+  @@index([foodName])                                // 食物名稱索引，方便搜尋
 }
