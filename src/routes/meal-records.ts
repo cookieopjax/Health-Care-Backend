@@ -17,8 +17,7 @@ interface CreateMealRecordBody {
   image_url: string;
   meal_type: MealType;
   notes?: string;
-  record_date?: string;  // ISO 格式的日期字串，如果沒提供就用當前日期
-  record_time?: string;  // ISO 格式的時間字串，如果沒提供就用當前時間
+  eaten_at?: string;  // ISO 8601 UTC 時間戳，如果沒提供就用當前時間
 }
 
 // 定義路由插件
@@ -68,13 +67,10 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
             enum: ['breakfast', 'lunch', 'dinner', 'snack']
           },
           notes: { type: 'string' },
-          record_date: { 
+          eaten_at: { 
             type: 'string',
-            format: 'date'
-          },
-          record_time: { 
-            type: 'string',
-            format: 'time'
+            format: 'date-time',
+            description: 'ISO 8601 UTC 時間戳'
           }
         }
       },
@@ -112,14 +108,28 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
     },
     handler: async (request: FastifyRequest<{ Body: CreateMealRecordBody }>, reply: FastifyReply) => {
       try {
-        const { analysis, image_url, meal_type, notes, record_date, record_time } = request.body
-        const userId = request.user.id
+        const { analysis, image_url, meal_type, notes, eaten_at } = request.body
+        
+        console.log('完整的 request.user:', request.user)
+        console.log('request.headers:', request.headers)
+        const userId = request.user?.userId
 
+        if (!userId) {
+          return reply.code(401).send({
+            msg: '無法取得使用者身份，請重新登入'
+          })
+        }
+
+        console.log('userId:', userId)
+        
         // 從營養資訊陣列中找出各項營養素的值
         const findNutritionValue = (name: string): number | null => {
           const item = analysis.nutrition.find(n => n.name.toLowerCase() === name.toLowerCase())
           return item ? item.value : null
         }
+
+        // 處理時間
+        const eatenAtDate = eaten_at ? new Date(eaten_at) : new Date()
 
         // 建立記錄
         const mealRecord = await prisma.mealRecord.create({
@@ -137,8 +147,9 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
             fiber: findNutritionValue('fiber'),
             sugar: findNutritionValue('sugar'),
             sodium: findNutritionValue('sodium'),
-            recordDate: record_date ? new Date(record_date) : new Date(),
-            recordTime: record_time ? new Date(`1970-01-01T${record_time}`) : new Date(),
+            eaten_at: eatenAtDate,
+            eaten_date: eatenAtDate,  // PostgreSQL 會自動轉換為日期
+            createdTime: new Date()
           }
         })
 

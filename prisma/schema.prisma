@@ -60,16 +60,16 @@ model MealRecord {
   sodium      Float?                                 // 鈉（毫克）
   
   // 時間資訊
-  recordDate  DateTime  @db.Date                     // 記錄日期
-  recordTime  DateTime  @db.Time()                   // 記錄時間
-  createdAt   DateTime  @default(now())              // 建立時間
-  updatedAt   DateTime  @updatedAt                   // 更新時間
+  eaten_at     DateTime                               // 用餐時間
+  eaten_date   DateTime  @db.Date                     // 用餐日期
+  createdTime  DateTime  @default(now())              // 建立時間
+  updatedAt    DateTime  @updatedAt                   // 更新時間
 
   // 關聯設定
   user        User      @relation(fields: [userId], references: [id])
 
   // 索引設定
-  @@index([userId, recordDate])                      // 複合索引：使用者 ID + 記錄日期
-  @@index([recordDate])                              // 單一索引：日期
+  @@index([userId, eaten_date])                      // 複合索引：使用者 ID + 用餐日期
+  @@index([eaten_date])                              // 單一索引：用餐日期
   @@index([foodName])                                // 食物名稱索引，方便搜尋
 }
