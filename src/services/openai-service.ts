@@ -9,42 +9,26 @@ import path from 'path'
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'
 
 const exampleObject = {
+  "isFood": true,
   "name": "食物名稱",
-  "nutrition": [
-    {
-      "id": 1,
-      "name": "總熱量",
-      "unit": "kcal",
-      "value": 2000
-    },
-    {
-      "id": 2,
-      "name": "蛋白質",
-      "unit": "g",
-      "value": 75
-    },
-    {
-      "id": 3,
-      "name": "脂肪",
-      "unit": "g",
-      "value": 60
-    },
-    {
-      "id": 4,
-      "name": "碳水化合物",
-      "unit": "g",
-      "value": 250
-    },
-  ]
+  "nutrition": {
+    "calories": 2000,
+    "protein": 75,
+    "carbs": 250,
+    "fat": 60,
+    "fiber": 10,
+    "sugar": 20,
+    "sodium": 1000
+  }
 }
 const analysisPrompt = `
-  你是一個專業的營養師，請分析以下食物圖片，並給出食物的營養成分和熱量。
+  你是一個專業的營養師，請分析以下食物圖片，並給出食物的營養成分和熱量
   若你判斷是範圍區間，請直接取平均值
+  如果圖片不是食物，isFood 為 false
+  如果圖片是食物，isFood 為 true
   請以 JSON 格式返回分析結果，任何其他文字都不要回傳
-  請以繁體中文回傳
   格式如以下範例：
   ${JSON.stringify(exampleObject)}
-  
 `
 
 // 定義分析結果介面
@@ -120,6 +104,8 @@ async function processImage(imagePath: string): Promise<AnalysisResult> {
 
   const cleanedString = analysisResult.replace(/^```json\n/, '').replace(/\n```$/, '')
   const analysisResultObject = JSON.parse(cleanedString)
+
+  console.log(analysisResultObject)
 
   // 返回分析結果，包含 S3 對象鍵
   return {

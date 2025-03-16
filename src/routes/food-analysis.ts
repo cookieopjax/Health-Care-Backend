@@ -85,15 +85,15 @@ const routes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
               properties: {
                 name: { type: 'string' },
                 nutrition: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'number' },
-                      name: { type: 'string' },
-                      unit: { type: 'string' },
-                      value: { type: 'number' }
-                    }
+                  type: 'object',
+                  properties: {
+                    calories: { type: 'number' },
+                    protein: { type: 'number' },
+                    carbs: { type: 'number' },
+                    fat: { type: 'number' },
+                    fiber: { type: 'number' },
+                    sugar: { type: 'number' },
+                    sodium: { type: 'number' }
                   }
                 }
               }
